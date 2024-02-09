@@ -18,5 +18,7 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
+    - name: Build source distribution
+      run: python3 setup.py sdist
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
