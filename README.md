@@ -1,6 +1,6 @@
-#LimelightLib Python
+# LimelightLib Python
 
-# Discover all connected Limelights, and interact with them via REST and Websockets
+## Discover all connected Limelights, and interact with them via REST and Websockets
 
 ```
 import limelight
