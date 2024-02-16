@@ -3,28 +3,40 @@ import threading
 import socket
 import websocket
 import json
+import netifaces
 
 def broadcast_message(message, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.sendto(message.encode(), ('255.255.255.255', port))
 
+def broadcast_on_all_interfaces(message, port):
+    for interface in netifaces.interfaces():
+        addr = netifaces.ifaddresses(interface).get(netifaces.AF_INET)
+        if addr:
+            broadcast_addr = addr[0].get('broadcast')
+            if broadcast_addr:
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                    sock.sendto(message.encode(), (broadcast_addr, port))
+
+
 def listen_for_responses(port,timeout=1):
     discovered_devices = []
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
-        sock.bind(("", port))  # Listen on port 5809
+        sock.bind(("", port))
         sock.settimeout(timeout)
         try:
             while True:
                 data, addr = sock.recvfrom(1024)
                 discovered_devices.append(addr[0])
-                print(f"Received data from {addr}: {data.decode()}")
+                #print(f"Received data from {addr}: {data.decode()}")
         except socket.timeout:
             pass
     return discovered_devices
 
 def discover_limelights(broadcast_port=5809, listen_port=5809, timeout=2):
-    broadcast_message("LLPhoneHome",broadcast_port)
+    broadcast_on_all_interfaces("LLPhoneHome",broadcast_port)
     return listen_for_responses(listen_port,timeout)
 
 class Limelight:

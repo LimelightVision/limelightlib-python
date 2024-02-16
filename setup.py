@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
 name='limelightlib-python',
-version='0.9.0',
+version='0.9.1',
 url='https://limelightvision.io',
 author='Brandon Hjelstrom',
 author_email='brandon@limelightvision.io',
