@@ -20,7 +20,6 @@ def broadcast_on_all_interfaces(message, port):
                     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
                     sock.sendto(message.encode(), (broadcast_addr, port))
 
-
 def listen_for_responses(port,timeout=1):
     discovered_devices = []
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
@@ -104,6 +103,31 @@ class Limelight:
 
     def delete_cal_file(self):
         return requests.delete(f"{self.base_url}/cal-file")
+
+        def get_status(self):
+        response = requests.get(f"{self.base_url}/status")
+        if response.ok:
+            return response.json()
+        else:
+            return None
+
+    def get_name(self):
+        status = self.get_status()
+        if status and 'status' in status:
+            return status['status'].get('name', None)
+        return None
+
+    def get_temp(self):
+        status = self.get_status()
+        if status and 'status' in status:
+            return status['status'].get('temp', None)
+        return None
+
+    def get_fps(self):
+        status = self.get_status()
+        if status and 'status' in status:
+            return status['status'].get('fps', None)
+        return None
 
     def enable_websocket(self):
         def on_message(ws, message):
