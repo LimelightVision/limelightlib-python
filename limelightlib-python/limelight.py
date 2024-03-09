@@ -104,7 +104,7 @@ class Limelight:
     def delete_cal_file(self):
         return requests.delete(f"{self.base_url}/cal-file")
 
-        def get_status(self):
+    def get_status(self):
         response = requests.get(f"{self.base_url}/status")
         if response.ok:
             return response.json()
