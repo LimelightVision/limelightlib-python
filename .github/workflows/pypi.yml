@@ -21,7 +21,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       name: "Checkout"
+    - name: Install build
+      run: python3 -m pip install build
     - name: Build source distribution
-      run: python3 setup.py sdist
+      run: python3 -m build
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
