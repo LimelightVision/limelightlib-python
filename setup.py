@@ -16,6 +16,8 @@ classifiers=[
 ],
 install_requires=[
     'websocket-client>=1.5',
+    'requests',
+    'ifaddr',
 ],
 python_requires='>=3.6',
 )
