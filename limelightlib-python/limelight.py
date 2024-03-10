@@ -1,9 +1,10 @@
+import ipaddress
 import requests
 import threading
 import socket
 import websocket
 import json
-import netifaces
+import ifaddr
 
 def broadcast_message(message, port):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
@@ -11,14 +12,15 @@ def broadcast_message(message, port):
         sock.sendto(message.encode(), ('255.255.255.255', port))
 
 def broadcast_on_all_interfaces(message, port):
-    for interface in netifaces.interfaces():
-        addr = netifaces.ifaddresses(interface).get(netifaces.AF_INET)
-        if addr:
-            broadcast_addr = addr[0].get('broadcast')
-            if broadcast_addr:
-                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
-                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                    sock.sendto(message.encode(), (broadcast_addr, port))
+    for adapter in ifaddr.get_adapters():
+        for ip in adapter.ips:
+            if ip.is_IPv4:
+                net = ipaddress.ip_network(f"{ip.ip}/{ip.network_prefix}", False)
+            else:
+                net = ipaddress.ip_network(f"{ip.ip[0]}/{ip.network_prefix}", False)
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+                sock.sendto(message.encode(), (str(net.broadcast_address), port))
 
 def listen_for_responses(port,timeout=1):
     discovered_devices = []
@@ -104,7 +106,7 @@ class Limelight:
     def delete_cal_file(self):
         return requests.delete(f"{self.base_url}/cal-file")
 
-        def get_status(self):
+    def get_status(self):
         response = requests.get(f"{self.base_url}/status")
         if response.ok:
             return response.json()

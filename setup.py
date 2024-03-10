@@ -7,7 +7,8 @@ url='https://limelightvision.io',
 author='Brandon Hjelstrom',
 author_email='brandon@limelightvision.io',
 description='Built to interface with any Limelight Smart Camera',
-packages=find_packages(),
+py_modules=["limelight", "limelightresults"],
+package_dir={"": "limelightlib-python"},
 classifiers=[
 'Programming Language :: Python :: 3',
 'License :: OSI Approved :: MIT License',
@@ -15,6 +16,8 @@ classifiers=[
 ],
 install_requires=[
     'websocket-client>=1.5',
+    'requests',
+    'ifaddr',
 ],
 python_requires='>=3.6',
 )
